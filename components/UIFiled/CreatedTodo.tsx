@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // "use client";
 
 // import { zodResolver } from "@hookform/resolvers/zod";
@@ -688,7 +690,7 @@ export function ManageTodoForm() {
           reset({ todo: res.data.todo });
         } catch (error) {
           console.error("Error fetching todo:", error);
-          toast(`Error fetching todo ID ${todoIdToManage}`, { type: "error" });
+          toast(`Error fetching todo ID ${todoIdToManage}`);
         }
       } else {
         setExistingTodo(null);
@@ -735,7 +737,7 @@ export function ManageTodoForm() {
       }
     } catch (error) {
       console.error("Error submitting todo:", error);
-      toast("Something went wrong", { type: "error" });
+      toast("Something went wrong");
     }
   };
 

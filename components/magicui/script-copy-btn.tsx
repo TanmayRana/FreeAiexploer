@@ -1600,7 +1600,7 @@ export function ScriptCopyBtn({
       }
     } catch (err) {
       console.error("Delete failed", err);
-      toast("Delete operation failed", { type: "error" });
+      toast("Delete operation failed");
     }
   };
 
