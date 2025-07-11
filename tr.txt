@@ -1,0 +1,254 @@
+// "use client";
+
+// import { Button } from "@/components/ui/button";
+// import { cn } from "@/lib/utils";
+// import { Check, ChevronDown, Copy } from "lucide-react";
+// import { motion } from "framer-motion"; // Correct import for motion
+// import { useTheme } from "next-themes";
+// import { HTMLAttributes, useEffect, useState } from "react";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
+// import { useParams, usePathname, useRouter } from "next/navigation";
+// import { commandMapArray } from "@/app/api-guide/_components/commandMapData";
+// // import { useRouter } from "next/router"; // Correct import for useRouter
+
+// interface ScriptCopyBtnProps extends HTMLAttributes<HTMLDivElement> {
+//   showMultiplePackageOptions?: boolean;
+//   codeLanguage: string;
+//   lightTheme: string;
+//   darkTheme: string;
+//   commandMap: Record<string, string>;
+//   className?: string;
+// }
+
+// export function ScriptCopyBtn({
+//   showMultiplePackageOptions = true,
+//   codeLanguage,
+//   lightTheme,
+//   darkTheme,
+//   commandMap,
+//   className,
+// }: ScriptCopyBtnProps) {
+//   const packageManagers = Object.keys(commandMap);
+
+//   const [visibleManagers, setVisibleManagers] = useState(
+//     packageManagers.slice(0, 4)
+//   ); // First 4 items
+//   const [remainingManagers, setRemainingManagers] = useState(
+//     packageManagers.slice(4)
+//   ); // Remaining items
+//   const [packageManager, setPackageManager] = useState(visibleManagers[0]);
+//   const [copied, setCopied] = useState(false);
+//   const [highlightedCode, setHighlightedCode] = useState("");
+//   const { theme } = useTheme();
+//   const router = useRouter();
+//   const path = usePathname();
+//   const param = useParams();
+
+//   useEffect(() => {
+//     async function loadHighlightedCode() {
+//       try {
+//         const { codeToHtml } = await import("shiki");
+//         const highlighted = await codeToHtml(commandMap[packageManager], {
+//           lang: codeLanguage,
+//           themes: {
+//             light: lightTheme,
+//             dark: darkTheme,
+//           },
+//           defaultColor: theme === "dark" ? "dark" : "light",
+//         });
+//         setHighlightedCode(highlighted);
+//       } catch (error) {
+//         console.error("Error highlighting code:", error);
+//         setHighlightedCode(`<pre>${commandMap[packageManager]}</pre>`);
+//       }
+//     }
+
+//     loadHighlightedCode();
+//   }, [packageManager, codeLanguage, lightTheme, darkTheme, theme, commandMap]);
+
+//   const copyToClipboard = () => {
+//     navigator.clipboard.writeText(commandMap[packageManager]);
+//     setCopied(true);
+//     setTimeout(() => setCopied(false), 2000);
+//   };
+
+//   const handleDropdownSelect = (selected: string) => {
+//     const newVisibleManagers = [selected, ...visibleManagers];
+//     const newRemainingManagers = remainingManagers.filter(
+//       (pm) => pm !== selected
+//     );
+
+//     if (newVisibleManagers.length > 5) {
+//       const removedItem = newVisibleManagers.pop();
+//       if (removedItem) {
+//         newRemainingManagers.push(removedItem);
+//       }
+//     }
+
+//     setVisibleManagers(newVisibleManagers.slice(0, 5));
+//     setRemainingManagers(newRemainingManagers);
+//     setPackageManager(selected);
+//     router.push(`?packageManager=${selected}`);
+//   };
+
+//   const splitPath = path.split("/")[2];
+
+//   const selectedIndex =
+//     visibleManagers.indexOf(packageManager) !== -1
+//       ? visibleManagers.indexOf(packageManager)
+//       : visibleManagers.length + remainingManagers.indexOf(packageManager);
+
+//   console.log("Full selected index:", selectedIndex);
+
+//   // TODO: this part
+
+//   const data = Object.keys(commandMapArray[splitPath]);
+//   console.log("data", Object.values(commandMapArray[splitPath]));
+
+//   console.log("setVisibleManagers", visibleManagers);
+
+//   return (
+//     <div className={cn("flex items-center justify-center w-full", className)}>
+//       <div className="w-full space-y-2">
+//         <div className="mb-2 flex items-center justify-between">
+//           {showMultiplePackageOptions && (
+//             <div className="relative w-full">
+//               <div className="inline-flex overflow-hidden rounded-md border border-border text-xs w-full items-center justify-between py-2">
+//                 {visibleManagers.map((pm, index) => (
+//                   <div key={pm} className="flex items-center">
+//                     {index > 0 && (
+//                       <div className="h-4 w-px bg-border" aria-hidden="true" />
+//                     )}
+//                     <Button
+//                       variant="ghost"
+//                       size="sm"
+//                       className={`relative rounded-none bg-background px-2 py-1 hover:bg-background ${
+//                         packageManager === pm
+//                           ? "text-primary"
+//                           : "text-muted-foreground"
+//                       }`}
+//                       onClick={() => setPackageManager(pm)}
+//                     >
+//                       {pm}
+//                       {packageManager === pm && (
+//                         <motion.div
+//                           className="absolute inset-x-0 bottom-[1px] mx-auto h-0.5 w-[90%] bg-primary"
+//                           layoutId="activeTab"
+//                           initial={false}
+//                           transition={{
+//                             type: "spring",
+//                             stiffness: 500,
+//                             damping: 30,
+//                           }}
+//                         />
+//                       )}
+//                     </Button>
+//                   </div>
+//                 ))}
+//                 <div className="pr-4 flex items-center justify-center">
+//                   {remainingManagers.length > 0 && (
+//                     <DropdownMenu>
+//                       <DropdownMenuTrigger>
+//                         <ChevronDown className="h-5 w-5" />
+//                       </DropdownMenuTrigger>
+//                       <DropdownMenuContent>
+//                         {remainingManagers.map((pm) => (
+//                           <DropdownMenuItem
+//                             key={pm}
+//                             onClick={() => handleDropdownSelect(pm)}
+//                             className={
+//                               packageManager === pm ? "text-primary" : ""
+//                             }
+//                           >
+//                             {pm}
+//                           </DropdownMenuItem>
+//                         ))}
+//                       </DropdownMenuContent>
+//                     </DropdownMenu>
+//                   )}
+//                 </div>
+//               </div>
+//             </div>
+//           )}
+//         </div>
+//         <div className="relative flex items-center">
+//           <div className="min-w-[300px] grow font-mono">
+//             {highlightedCode ? (
+//               <div
+//                 className={`overflow-x-auto rounded-md p-2 px-4 font-mono ${
+//                   theme === "dark" ? "dark" : "light"
+//                 }`}
+//                 dangerouslySetInnerHTML={{ __html: highlightedCode }}
+//               />
+//             ) : (
+//               <pre className="rounded-md border border-border bg-white p-2 px-4 font-mono dark:bg-black">
+//                 {commandMap[packageManager]}
+//               </pre>
+//             )}
+//           </div>
+//           <Button
+//             variant="outline"
+//             size="icon"
+//             className="relative ml-2 rounded-md"
+//             onClick={copyToClipboard}
+//             aria-label={copied ? "Copied" : "Copy to clipboard"}
+//           >
+//             <span className="sr-only">{copied ? "Copied" : "Copy"}</span>
+//             <Copy
+//               className={`h-4 w-4 transition-all duration-300 ${
+//                 copied ? "scale-0" : "scale-100"
+//               }`}
+//             />
+//             <Check
+//               className={`absolute inset-0 m-auto h-4 w-4 transition-all duration-300 ${
+//                 copied ? "scale-100" : "scale-0"
+//               }`}
+//             />
+//           </Button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+docker
+
+
+FROM maven:3.8.4-openjdk-17 AS build
+
+
+WORKDIR /app
+
+
+COPY pom.xml .
+
+
+RUN mvn dependency:go-offline
+
+
+COPY src ./src
+
+
+RUN mvn clean package -DskipTests
+
+
+FROM openjdk:17-jdk-slim
+
+
+WORKDIR /app
+
+
+COPY --from=build /app/target/demomyapp-0.0.1-SNAPSHOT.jar .
+
+
+EXPOSE 8080
+
+
+ENTRYPOINT ["java", "-jar", "/app/demomyapp-0.0.1-SNAPSHOT.jar"]
