@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { GetgenerateContent } from "@/lib/GetgenerateContent";
 
 // export async function GET(request: Request) {
